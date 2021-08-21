@@ -3,8 +3,8 @@ package com.iex.iexservice.repositories;
 import com.iex.iexservice.entities.Quote;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface QuoteRepo extends MongoRepository<Quote,String> {
-    List<Quote> findTopByPreviousVolume();
+    Optional<Quote> findById(String s);
 }
