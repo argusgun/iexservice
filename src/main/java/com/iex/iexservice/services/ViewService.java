@@ -33,7 +33,7 @@ public class ViewService implements CommandLineRunner {
     public void run(String... args) {
         while (true) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(300000);
 
                 List<Quote> quoteList =quoteRepo.findAll(Sort.by(Sort.Direction.DESC, "previousVolume ")).stream()
                         .limit(5)

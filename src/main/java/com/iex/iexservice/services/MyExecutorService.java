@@ -130,8 +130,9 @@ public class MyExecutorService implements CommandLineRunner {
                                     d = Math.abs(quote.getLatestPrice() - qdb.getLatestPrice());
                                     changeQuoteRepo.save(new ChangeQuote(quote.getSymbol(), d));
                                 }
-                                quoteRepo.save(quote);
+
                             }
+                            quoteRepo.save(quote);
                         }
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
