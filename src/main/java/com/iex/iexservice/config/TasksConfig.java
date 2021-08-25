@@ -3,17 +3,11 @@ package com.iex.iexservice.config;
 import com.iex.iexservice.services.MyExecutorService;
 import com.iex.iexservice.services.ViewService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-@Component
-@EnableScheduling
-    public class TasksConfig {
-    private ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+@Service
+public class TasksConfig {
     private final MyExecutorService executorService;
     private final ViewService viewService;
 
@@ -23,14 +17,14 @@ import java.util.concurrent.Executors;
         this.viewService = viewService;
     }
 
-    @Scheduled(fixedDelay = 0)
-    public void executeAppService(){
-    executorService.execute(threadPool);
+    @Scheduled(fixedDelay = 1)
+    public void executeAppService() {
+        executorService.execute();
     }
 
-    @Scheduled(cron="*/5 * * * * *")
-    public void executeView(){
-    viewService.viewTopStocks();
-    viewService.viewTopCompanies();
+    @Scheduled(cron = "*/5 * * * * *")
+    public void executeView() {
+        viewService.viewTopStocks();
+        viewService.viewTopCompanies();
     }
 }

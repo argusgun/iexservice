@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,17 +36,30 @@ public class ViewService {
 
 
     public void viewTopStocks() {
-        List<Quote> quoteList = quoteRepo.findAll(Sort.by(Sort.Direction.DESC, "previousVolume ")).stream()
-                .limit(5)
-                .collect(Collectors.toList());
+        List<Quote> quoteList =new ArrayList<>();
+        try {
+            quoteList = quoteRepo.findAll(Sort.by(Sort.Direction.DESC, "previousVolume ")).stream()
+                    .limit(5)
+                    .collect(Collectors.toList());
+        }catch (Exception e){
+
+        }
+
         logger.info("The top 5 highest value stocks:" + quoteList);
     }
 
     public void viewTopCompanies() {
-        List<Company> companyList = changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
-                .limit(5)
-                .map(p -> companyRepo.findById(p.getSymbol()).get())
-                .collect(Collectors.toList());
+        List<Company>  companyList=new ArrayList<>();
+        try {
+            companyList = changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
+                    .limit(5)
+                    .map(p -> companyRepo.findById(p.getSymbol()).get())
+                    .collect(Collectors.toList());
+        }catch (Exception e){
+
+        }
+
+
         logger.info("The most recent 5 companies that have the greatest change:" + companyList);
     }
 

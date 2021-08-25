@@ -17,18 +17,19 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
 @Data
 public class MyExecutorService {
 
-
     private final QuoteRepo quoteRepo;
     private final SymbolRepo symbolRepo;
     private final CompanyRepo companyRepo;
     private final ChangeQuoteRepo changeQuoteRepo;
     private final Logger logger = LoggerFactory.getLogger(MyExecutorService.class);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
     public MyExecutorService(QuoteRepo quoteRepo, SymbolRepo symbolRepo, CompanyRepo companyRepo, ChangeQuoteRepo changeQuoteRepo) {
         this.quoteRepo = quoteRepo;
@@ -64,44 +65,38 @@ public class MyExecutorService {
 
     private List<CompletableFuture<Company>> getCompaniesFromIex(ExecutorService threadPool, Symbols symbols) {
         RestTemplate restTemplate = new RestTemplate();
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(System.getenv("site"));
-        stringBuffer.append("/stock/");
+
         return symbols.getSymbols().stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append(System.getenv("site"));
+                    stringBuffer.append("/stock/");
                     stringBuffer.append(s.getSymbol());
                     stringBuffer.append("/company?");
                     stringBuffer.append(System.getenv("tkn"));
                     return restTemplate.getForObject(stringBuffer.toString(), Company.class);
-//                                new ObjectMapper()
-//                                .readerFor(Company.class)
-//                                .readValue(new URL("https://sandbox.iexapis.com/stable/stock/" + s.getSymbol() + "/company?token=Tpk_ee567917a6b640bb8602834c9d30e571"));
-//                    if (!company.equals(getCompaniesFromDB(company.getSymbol())) || getCompaniesFromDB(company.getSymbol()) == null)
-//                        companyRepo.save(company);
                 }, threadPool))
                 .collect(Collectors.toList());
     }
 
     private List<CompletableFuture<Quote>> getQuotesFromIex(ExecutorService threadPool, Symbols symbols) {
         RestTemplate restTemplate = new RestTemplate();
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(System.getenv("site"));
-        stringBuffer.append("/stock/");
+
         return symbols.getSymbols().stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append(System.getenv("site"));
+                    stringBuffer.append("/stock/");
                     stringBuffer.append(s.getSymbol());
                     stringBuffer.append("/quote?");
                     stringBuffer.append(System.getenv("tkn"));
                     Quote quote = restTemplate.getForObject(stringBuffer.toString(), Quote.class);
-//                                new ObjectMapper()
-//                                .readerFor(Quote.class)
-//                                .readValue(new URL("https://sandbox.iexapis.com/stable/stock/" + s.getSymbol() + "/quote?token=Tpk_ee567917a6b640bb8602834c9d30e571"));
                     return quote;
                 }, threadPool))
                 .collect(Collectors.toList());
     }
 
-    public void execute(ExecutorService threadPool) {
+    public void execute() {
         try {
             Symbols symbols = getSymbolsFromIex(threadPool).get();
             logger.info("Get Symbols from IEX succeed");
@@ -111,9 +106,9 @@ public class MyExecutorService {
                         try {
                             company = p.get();
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            return false;
                         } catch (ExecutionException e) {
-                            e.printStackTrace();
+                            return false;
                         }
                         if (!company.equals(getCompaniesFromDB(company.getSymbol())) || getCompaniesFromDB(company.getSymbol()) == null)
                             return true;
@@ -123,11 +118,10 @@ public class MyExecutorService {
                         try {
                             return p.get();
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            return null;
                         } catch (ExecutionException e) {
-                            e.printStackTrace();
+                            return null;
                         }
-                        return null;
                     })
                     .collect(Collectors.toList());
             companyRepo.saveAll(companies);
@@ -137,11 +131,10 @@ public class MyExecutorService {
                         try {
                             return p.get();
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            return null;
                         } catch (ExecutionException e) {
-                            e.printStackTrace();
+                            return null;
                         }
-                        return null;
                     })
                     .collect(Collectors.toList());
             quoteRepo.saveAll(quotes);
