@@ -1,58 +1,52 @@
 package com.iex.iexservice.services;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iex.iexservice.entities.*;
 import com.iex.iexservice.repositories.ChangeQuoteRepo;
 import com.iex.iexservice.repositories.CompanyRepo;
 import com.iex.iexservice.repositories.QuoteRepo;
 import com.iex.iexservice.repositories.SymbolRepo;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 @Data
-public class MyExecutorService implements CommandLineRunner {
+public class MyExecutorService {
 
-    @Autowired
-    QuoteRepo quoteRepo;
-    @Autowired
-    SymbolRepo symbolRepo;
-    @Autowired
-    CompanyRepo companyRepo;
-    @Autowired
-    ChangeQuoteRepo changeQuoteRepo;
 
-    private final ExecutorService threadPool = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
-    private Symbols symbols;
+    private final QuoteRepo quoteRepo;
+    private final SymbolRepo symbolRepo;
+    private final CompanyRepo companyRepo;
+    private final ChangeQuoteRepo changeQuoteRepo;
+    private final Logger logger = LoggerFactory.getLogger(MyExecutorService.class);
 
-    private CompletableFuture<Symbols> getSymbolsFromIex() {
-        return CompletableFuture.supplyAsync(() -> {
-            Symbols symbols = null;
-            try {
-                symbols = new ObjectMapper()
-                        .readerFor(Symbols.class)
-                        .readValue(new URL("https://sandbox.iexapis.com/stable/ref-data/symbols?token=Tpk_ee567917a6b640bb8602834c9d30e571"));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return symbols;
-        }, threadPool);
+    public MyExecutorService(QuoteRepo quoteRepo, SymbolRepo symbolRepo, CompanyRepo companyRepo, ChangeQuoteRepo changeQuoteRepo) {
+        this.quoteRepo = quoteRepo;
+        this.symbolRepo = symbolRepo;
+        this.companyRepo = companyRepo;
+        this.changeQuoteRepo = changeQuoteRepo;
+    }
+
+    private CompletableFuture<Symbols> getSymbolsFromIex(ExecutorService threadPool) {
+        logger.info("Start ");
+        RestTemplate restTemplate = new RestTemplate();
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(System.getenv("site"));
+        stringBuffer.append("/ref-data/symbols?");
+        stringBuffer.append(System.getenv("tkn"));
+        return CompletableFuture.supplyAsync(() ->
+                        restTemplate.getForObject(stringBuffer.toString(), Symbols.class)
+                , threadPool);
     }
 
     private List<Symbol> getSymbolsFromDB() {
@@ -68,77 +62,109 @@ public class MyExecutorService implements CommandLineRunner {
         }
     }
 
-    private List<CompletableFuture<Void>> equalsCompanies() {
-        return getSymbols().getSymbols().stream()
-                .map(s -> CompletableFuture.runAsync(() -> {
-                    try {
-                        Company company = new ObjectMapper()
-                                .readerFor(Company.class)
-                                .readValue(new URL("https://sandbox.iexapis.com/stable/stock/" + s.getSymbol() + "/company?token=Tpk_ee567917a6b640bb8602834c9d30e571"));
-                        if (!company.equals(getCompaniesFromDB(company.getSymbol())) || getCompaniesFromDB(company.getSymbol()) == null)
-                            companyRepo.save(company);
-                    } catch (IOException exception) {
-//                        exception.printStackTrace();
-                    }
+    private List<CompletableFuture<Company>> getCompaniesFromIex(ExecutorService threadPool, Symbols symbols) {
+        RestTemplate restTemplate = new RestTemplate();
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(System.getenv("site"));
+        stringBuffer.append("/stock/");
+        return symbols.getSymbols().stream()
+                .map(s -> CompletableFuture.supplyAsync(() -> {
+                    stringBuffer.append(s.getSymbol());
+                    stringBuffer.append("/company?");
+                    stringBuffer.append(System.getenv("tkn"));
+                    return restTemplate.getForObject(stringBuffer.toString(), Company.class);
+//                                new ObjectMapper()
+//                                .readerFor(Company.class)
+//                                .readValue(new URL("https://sandbox.iexapis.com/stable/stock/" + s.getSymbol() + "/company?token=Tpk_ee567917a6b640bb8602834c9d30e571"));
+//                    if (!company.equals(getCompaniesFromDB(company.getSymbol())) || getCompaniesFromDB(company.getSymbol()) == null)
+//                        companyRepo.save(company);
                 }, threadPool))
                 .collect(Collectors.toList());
     }
 
-    private List<CompletableFuture<Quote>> getQuotesFromIex() {
-        return getSymbols().getSymbols().stream()
+    private List<CompletableFuture<Quote>> getQuotesFromIex(ExecutorService threadPool, Symbols symbols) {
+        RestTemplate restTemplate = new RestTemplate();
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(System.getenv("site"));
+        stringBuffer.append("/stock/");
+        return symbols.getSymbols().stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
-                    Quote quote = null;
-                    try {
-                        quote = new ObjectMapper()
-                                .readerFor(Quote.class)
-                                .readValue(new URL("https://sandbox.iexapis.com/stable/stock/" + s.getSymbol() + "/quote?token=Tpk_ee567917a6b640bb8602834c9d30e571"));
-                    } catch (IOException exception) {
-//                        exception.printStackTrace();
-                    }
+                    stringBuffer.append(s.getSymbol());
+                    stringBuffer.append("/quote?");
+                    stringBuffer.append(System.getenv("tkn"));
+                    Quote quote = restTemplate.getForObject(stringBuffer.toString(), Quote.class);
+//                                new ObjectMapper()
+//                                .readerFor(Quote.class)
+//                                .readValue(new URL("https://sandbox.iexapis.com/stable/stock/" + s.getSymbol() + "/quote?token=Tpk_ee567917a6b640bb8602834c9d30e571"));
                     return quote;
                 }, threadPool))
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void run(String... args) {
+    public void execute(ExecutorService threadPool) {
         try {
-            while (true) {
-                setSymbols(getSymbolsFromIex().get());
-
-                equalsCompanies().stream().forEach(p -> {
-                    try {
-
-//                    System.out.println("Company");
-                        p.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                });
-                getQuotesFromIex().stream().forEach(p -> {
-                    try {
-//                        System.out.println("Quote");
-                        Quote quote = p.get();
-                        if (quote != null) {
-                            Quote qdb = null;
-
-                            Optional<Quote> qdb1 = quoteRepo.findById(quote.getSymbol());
-                            if (!Optional.empty().equals(qdb1)) {
-                                qdb = qdb1.get();
-                                double d;
-                                if (quote.getLatestPrice() != null && qdb.getLatestPrice() != null) {
-                                    d = Math.abs(quote.getLatestPrice() - qdb.getLatestPrice());
-                                    changeQuoteRepo.save(new ChangeQuote(quote.getSymbol(), d));
-                                }
-
-                            }
-                            quoteRepo.save(quote);
+            Symbols symbols = getSymbolsFromIex(threadPool).get();
+            logger.info("Get Symbols from IEX succeed");
+            List<Company> companies = getCompaniesFromIex(threadPool, symbols).stream()
+                    .filter(p -> {
+                        Company company = null;
+                        try {
+                            company = p.get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
                         }
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
+                        if (!company.equals(getCompaniesFromDB(company.getSymbol())) || getCompaniesFromDB(company.getSymbol()) == null)
+                            return true;
+                        else return false;
+                    })
+                    .map(p -> {
+                        try {
+                            return p.get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    })
+                    .collect(Collectors.toList());
+            companyRepo.saveAll(companies);
+            logger.info("Save Companies to DB succeed");
+            List<Quote> quotes = getQuotesFromIex(threadPool, symbols).stream().
+                    map(p -> {
+                        try {
+                            return p.get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    })
+                    .collect(Collectors.toList());
+            quoteRepo.saveAll(quotes);
+            logger.info("Save Quotes to DB succeed");
+            List<ChangeQuote> changeQuotes = quotes.stream()
+                    .map(p -> {
+                                Optional<Quote> qdb1 = quoteRepo.findById(p.getSymbol());
+                                if (!Optional.empty().equals(qdb1)) {
+                                    Quote qdb = qdb1.get();
+                                    double d;
+                                    if (p.getLatestPrice() != null && qdb.getLatestPrice() != null) {
+                                        d = Math.abs(p.getLatestPrice() - qdb.getLatestPrice());
+                                        return new ChangeQuote(p.getSymbol(), d);
+                                    }
+                                    return null;
+
+                                }
+                                return null;
+                            }
+                    )
+                    .collect(Collectors.toList());
+            changeQuoteRepo.saveAll(changeQuotes);
+            logger.info("Save Changes for Quotes to DB succeed");
         } catch (Exception e) {
             e.printStackTrace();
         }
