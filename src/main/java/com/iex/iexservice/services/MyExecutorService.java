@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -126,8 +127,18 @@ public class MyExecutorService {
                     .collect(Collectors.toList());
             companyRepo.saveAll(companies);
             logger.info("Save Companies to DB succeed");
-            List<Quote> quotes = getQuotesFromIex(threadPool, symbols).stream().
-                    map(p -> {
+            List<Quote> quotes = getQuotesFromIex(threadPool, symbols).stream()
+                    .filter(p -> {
+                        try {
+                            if(p.get()!=null) return true;
+                        } catch (InterruptedException e) {
+                            return false;
+                        } catch (ExecutionException e) {
+                            return false;
+                        }
+                        return false;
+                    })
+                    .map(p -> {
                         try {
                             return p.get();
                         } catch (InterruptedException e) {
@@ -156,7 +167,10 @@ public class MyExecutorService {
                             }
                     )
                     .collect(Collectors.toList());
-            changeQuoteRepo.saveAll(changeQuotes);
+            List<ChangeQuote> changeQuoteList=changeQuotes.stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            changeQuoteRepo.saveAll(changeQuoteList);
             logger.info("Save Changes for Quotes to DB succeed");
         } catch (Exception e) {
             e.printStackTrace();
