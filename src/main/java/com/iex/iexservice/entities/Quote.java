@@ -1,129 +1,124 @@
 package com.iex.iexservice.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.annotation.Id;
 
 @Data
 public class Quote {
-    @Id
+    @JsonProperty("symbol")
     private String symbol;
+    @JsonProperty("companyName")
     private String companyName;
+    @JsonProperty("primaryExchange")
     private String primaryExchange;
+    @JsonProperty("calculationPrice")
     private String calculationPrice;
+    @JsonProperty("open")
     private Double open;
+    @JsonProperty("openTime")
     private Long openTime;
+    @JsonProperty("openSource")
     private String openSource;
+    @JsonProperty("close")
     private Double close;
+    @JsonProperty("closeTime")
     private Long closeTime;
+    @JsonProperty("closeSource")
     private String closeSource;
+    @JsonProperty("high")
     private Double high;
+    @JsonProperty("highTime")
     private Long highTime;
+    @JsonProperty("highSource")
     private String highSource;
+    @JsonProperty("low")
     private Double low;
+    @JsonProperty("lowTime")
     private Long lowTime;
+    @JsonProperty("lowSource")
     private String lowSource;
+    @JsonProperty("latestPrice")
     private Double latestPrice;
+    @JsonProperty("latestSource")
     private String latestSource;
+    @JsonProperty("latestTime")
     private String latestTime;
+    @JsonProperty("latestUpdate")
     private Long latestUpdate;
+    @JsonProperty("latestVolume")
     private Long latestVolume;
+    @JsonProperty("iexRealtimePrice")
     private Double iexRealtimePrice;
+    @JsonProperty("iexRealtimeSize")
     private Long iexRealtimeSize;
+    @JsonProperty("iexLastUpdated")
     private Long iexLastUpdated;
+    @JsonProperty("delayedPrice")
     private Double delayedPrice;
+    @JsonProperty("delayedPriceTime")
     private Long delayedPriceTime;
+    @JsonProperty("oddLotDelayedPrice")
     private Double oddLotDelayedPrice;
+    @JsonProperty("oddLotDelayedPriceTime")
     private Long oddLotDelayedPriceTime;
+    @JsonProperty("extendedPrice")
     private Double extendedPrice;
+    @JsonProperty("extendedChange")
     private Double extendedChange;
+    @JsonProperty("extendedChangePercent")
     private Double extendedChangePercent;
+    @JsonProperty("extendedPriceTime")
     private Long extendedPriceTime;
+    @JsonProperty("previousClose")
     private Double previousClose;
+    @JsonProperty("previousVolume")
     private Long previousVolume;
+    @JsonProperty("change")
     private Double change;
+    @JsonProperty("changePercent")
     private Double changePercent;
+    @JsonProperty("volume")
     private Long volume;
+    @JsonProperty("iexMarketPercent")
     private Double iexMarketPercent;
+    @JsonProperty("iexVolume")
     private Long iexVolume;
+    @JsonProperty("avgTotalVolume")
     private Long avgTotalVolume;
+    @JsonProperty("iexBidPrice")
     private Double iexBidPrice;
+    @JsonProperty("iexBidSize")
     private Long iexBidSize;
+    @JsonProperty("iexAskPrice")
     private Double iexAskPrice;
+    @JsonProperty("iexAskSize")
     private Long iexAskSize;
+    @JsonProperty("iexOpen")
     private Double iexOpen;
+    @JsonProperty("iexOpenTime")
     private Long iexOpenTime;
+    @JsonProperty("iexClose")
     private Double iexClose;
+    @JsonProperty("iexCloseTime")
     private Long iexCloseTime;
+    @JsonProperty("marketCap")
     private Long marketCap;
+    @JsonProperty("peRatio")
     private Double peRatio;
+    @JsonProperty("week52High")
     private Double week52High;
+    @JsonProperty("week52Low")
     private Double week52Low;
+    @JsonProperty("ytdChange")
     private Double ytdChange;
+    @JsonProperty("lastTradeTime")
     private Long lastTradeTime;
+    @JsonProperty("currency")
     private String currency;
+    @JsonProperty("isUSMarketOpen")
     private boolean isUSMarketOpen;
 
-    @JsonCreator
-
-    public Quote(@JsonProperty("symbol") String symbol,
-                 @JsonProperty("companyName")String companyName,
-                 @JsonProperty("primaryExchange")String primaryExchange,
-                 @JsonProperty("calculationPrice")String calculationPrice,
-                 @JsonProperty("open")Double open,
-                 @JsonProperty("openTime")Long openTime,
-                 @JsonProperty("openSource")String openSource,
-                 @JsonProperty("close")Double close,
-                 @JsonProperty("closeTime")Long closeTime,
-                 @JsonProperty("closeSource")String closeSource,
-                 @JsonProperty("high")Double high,
-                 @JsonProperty("highTime")Long highTime,
-                 @JsonProperty("highSource")String highSource,
-                 @JsonProperty("low")Double low,
-                 @JsonProperty("lowTime")Long lowTime,
-                 @JsonProperty("lowSource")String lowSource,
-                 @JsonProperty("latestPrice")Double latestPrice,
-                 @JsonProperty("latestSource")String latestSource,
-                 @JsonProperty("latestTime")String latestTime,
-                 @JsonProperty("latestUpdate")Long latestUpdate,
-                 @JsonProperty("latestVolume")Long latestVolume,
-                 @JsonProperty("iexRealtimePrice")Double iexRealtimePrice,
-                 @JsonProperty("iexRealtimeSize")Long iexRealtimeSize,
-                 @JsonProperty("iexLastUpdated")Long iexLastUpdated,
-                 @JsonProperty("delayedPrice")Double delayedPrice,
-                 @JsonProperty("delayedPriceTime")Long delayedPriceTime,
-                 @JsonProperty("oddLotDelayedPrice")Double oddLotDelayedPrice,
-                 @JsonProperty("oddLotDelayedPriceTime")Long oddLotDelayedPriceTime,
-                 @JsonProperty("extendedPrice")Double extendedPrice,
-                 @JsonProperty("extendedChange")Double extendedChange,
-                 @JsonProperty("extendedChangePercent")Double extendedChangePercent,
-                 @JsonProperty("extendedPriceTime")Long extendedPriceTime,
-                 @JsonProperty("previousClose")Double previousClose,
-                 @JsonProperty("previousVolume")Long previousVolume,
-                 @JsonProperty("change")Double change,
-                 @JsonProperty("changePercent")Double changePercent,
-                 @JsonProperty("volume")Long volume,
-                 @JsonProperty("iexMarketPercent")Double iexMarketPercent,
-                 @JsonProperty("iexVolume")Long iexVolume,
-                 @JsonProperty("avgTotalVolume")Long avgTotalVolume,
-                 @JsonProperty("iexBidPrice")Double iexBidPrice,
-                 @JsonProperty("iexBidSize")Long iexBidSize,
-                 @JsonProperty("iexAskPrice")Double iexAskPrice,
-                 @JsonProperty("iexAskSize")Long iexAskSize,
-                 @JsonProperty("iexOpen")Double iexOpen,
-                 @JsonProperty("iexOpenTime")Long iexOpenTime,
-                 @JsonProperty("iexClose")Double iexClose,
-                 @JsonProperty("iexCloseTime")Long iexCloseTime,
-                 @JsonProperty("marketCap")Long marketCap,
-                 @JsonProperty("peRatio")Double peRatio,
-                 @JsonProperty("week52High")Double week52High,
-                 @JsonProperty("week52Low")Double week52Low,
-                 @JsonProperty("ytdChange")Double ytdChange,
-                 @JsonProperty("lastTradeTime")Long lastTradeTime,
-                 @JsonProperty("currency")String currency,
-                 @JsonProperty("isUSMarketOpen")boolean isUSMarketOpen) {
+    public Quote(String symbol, String companyName, String primaryExchange, String calculationPrice, Double open, Long openTime, String openSource, Double close, Long closeTime, String closeSource, Double high, Long highTime, String highSource, Double low, Long lowTime, String lowSource, Double latestPrice, String latestSource, String latestTime, Long latestUpdate, Long latestVolume, Double iexRealtimePrice, Long iexRealtimeSize, Long iexLastUpdated, Double delayedPrice, Long delayedPriceTime, Double oddLotDelayedPrice, Long oddLotDelayedPriceTime, Double extendedPrice, Double extendedChange, Double extendedChangePercent, Long extendedPriceTime, Double previousClose, Long previousVolume, Double change, Double changePercent, Long volume, Double iexMarketPercent, Long iexVolume, Long avgTotalVolume, Double iexBidPrice, Long iexBidSize, Double iexAskPrice, Long iexAskSize, Double iexOpen, Long iexOpenTime, Double iexClose, Long iexCloseTime, Long marketCap, Double peRatio, Double week52High, Double week52Low, Double ytdChange, Long lastTradeTime, String currency, boolean isUSMarketOpen) {
         this.symbol = symbol;
         this.companyName = companyName;
         this.primaryExchange = primaryExchange;

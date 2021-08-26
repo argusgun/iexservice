@@ -1,58 +1,37 @@
-package com.iex.iexservice.entities;
+package com.iex.iexservice.DAO;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iex.iexservice.entities.Company;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
 import java.util.Objects;
 
 @Data
-public class Company {
-    @JsonProperty("symbol")
+public class CompanyDAO {
+    @Id
     private String symbol;
-    @JsonProperty("companyName")
     private String companyName;
-    @JsonProperty("employees")
     private int employees;
-    @JsonProperty("exchange")
     private String exchange;
-    @JsonProperty("industry")
     private String industry;
-    @JsonProperty("website")
     private String website;
-    @JsonProperty("description")
     private String description;
-    @JsonProperty("CEO")
     private String CEO;
-    @JsonProperty("securityName")
     private String securityName;
-    @JsonProperty("issueType")
     private String issueType;
-    @JsonProperty("sector")
     private String sector;
-    @JsonProperty("primarySicCode")
     private int primarySicCode;
-    @JsonProperty("tags")
     private List<String> tags;
-    @JsonProperty("address")
     private String address;
-    @JsonProperty("address2")
     private String address2;
-    @JsonProperty("state")
     private String state;
-    @JsonProperty("city")
     private String city;
-    @JsonProperty("zip")
     private String zip;
-    @JsonProperty("country")
     private String country;
-    @JsonProperty("phone")
     private String phone;
 
-    public Company(String symbol, String companyName, int employees, String exchange, String industry, String website, String description, String CEO, String securityName, String issueType, String sector, int primarySicCode, List<String> tags, String address, String address2, String state, String city, String zip, String country, String phone) {
+    public CompanyDAO(String symbol, String companyName, int employees, String exchange, String industry, String website, String description, String CEO, String securityName, String issueType, String sector, int primarySicCode, List<String> tags, String address, String address2, String state, String city, String zip, String country, String phone) {
         this.symbol = symbol;
         this.companyName = companyName;
         this.employees = employees;
@@ -75,11 +54,64 @@ public class Company {
         this.phone = phone;
     }
 
+    public CompanyDAO() {
+
+    }
+
+    public static CompanyDAO fromEntityToDao(Company company) {
+        CompanyDAO dao = new CompanyDAO();
+        dao.symbol = company.getSymbol();
+        dao.companyName = company.getCompanyName();
+        dao.employees = company.getEmployees();
+        dao.exchange = company.getExchange();
+        dao.industry = company.getIndustry();
+        dao.website = company.getWebsite();
+        dao.description = company.getDescription();
+        dao.CEO = company.getCEO();
+        dao.securityName = company.getSecurityName();
+        dao.issueType = company.getIssueType();
+        dao.sector = company.getSector();
+        dao.primarySicCode = company.getPrimarySicCode();
+        dao.tags = company.getTags();
+        dao.address = company.getAddress();
+        dao.address2 = company.getAddress2();
+        dao.state = company.getState();
+        dao.city = company.getCity();
+        dao.zip = company.getZip();
+        dao.country = company.getCountry();
+        dao.phone = company.getPhone();
+        return dao;
+    }
+
+
+    public Company toEntity() {
+        return new Company(symbol,
+                companyName,
+                employees,
+                exchange,
+                industry,
+                website,
+                description,
+                CEO,
+                securityName,
+                issueType,
+                sector,
+                primarySicCode,
+                tags,
+                address,
+                address2,
+                state,
+                city,
+                zip,
+                country,
+                phone);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Company company = (Company) o;
+        CompanyDAO company = (CompanyDAO) o;
         return employees == company.employees &&
                 primarySicCode == company.primarySicCode &&
                 Objects.equals(symbol, company.symbol) &&

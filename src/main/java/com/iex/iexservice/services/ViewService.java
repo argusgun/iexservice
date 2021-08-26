@@ -1,5 +1,7 @@
 package com.iex.iexservice.services;
 
+import com.iex.iexservice.DAO.CompanyDAO;
+import com.iex.iexservice.DAO.QuoteDAO;
 import com.iex.iexservice.entities.Company;
 import com.iex.iexservice.entities.Quote;
 import com.iex.iexservice.repositories.ChangeQuoteRepo;
@@ -36,7 +38,7 @@ public class ViewService {
 
 
     public void viewTopStocks() {
-        List<Quote> quoteList =new ArrayList<>();
+        List<QuoteDAO> quoteList =new ArrayList<>();
         try {
             quoteList = quoteRepo.findAll(Sort.by(Sort.Direction.DESC, "previousVolume ")).stream()
                     .limit(5)
@@ -44,12 +46,11 @@ public class ViewService {
         }catch (Exception e){
 
         }
-
         logger.info("The top 5 highest value stocks:" + quoteList);
     }
 
     public void viewTopCompanies() {
-        List<Company>  companyList=new ArrayList<>();
+        List<CompanyDAO>  companyList=new ArrayList<>();
         try {
             companyList = changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
                     .limit(5)
@@ -58,8 +59,6 @@ public class ViewService {
         }catch (Exception e){
 
         }
-
-
         logger.info("The most recent 5 companies that have the greatest change:" + companyList);
     }
 
