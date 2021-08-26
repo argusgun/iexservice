@@ -1,29 +1,34 @@
-package com.iex.iexservice.config;
+package com.iex.iexservice.services;
 
-import com.iex.iexservice.services.MyExecutorService;
-import com.iex.iexservice.services.ViewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class TasksConfig {
     private final MyExecutorService executorService;
     private final ViewService viewService;
+    private final Environment environment;
+
 
     @Autowired
-    public TasksConfig(MyExecutorService executorService, ViewService viewService) {
+    public TasksConfig(Environment environment,MyExecutorService executorService, ViewService viewService) {
         this.executorService = executorService;
         this.viewService = viewService;
+        this.environment = environment;
     }
 
-    @Scheduled(fixedDelay = 1)
+    @Scheduled(fixedDelayString = "${f_delay}")
     public void executeAppService() {
         executorService.execute();
     }
 
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "${crontask}")
     public void executeView() {
+
         viewService.viewTopStocks();
         viewService.viewTopCompanies();
     }

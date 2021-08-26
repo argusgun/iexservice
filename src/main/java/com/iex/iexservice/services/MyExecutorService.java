@@ -13,6 +13,7 @@ import com.iex.iexservice.repositories.QuoteRepo;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -22,39 +23,36 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
 @Data
-@PropertySource("config.properties")
 public class MyExecutorService {
-
+    private final RestTemplate restTemplate;
     private final Environment environment;
     private final QuoteRepo quoteRepo;
     private final CompanyRepo companyRepo;
     private final ChangeQuoteRepo changeQuoteRepo;
     private final Logger logger = LoggerFactory.getLogger(MyExecutorService.class);
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    private final ScheduledExecutorService threadPool;
 
-    public MyExecutorService(Environment environment,QuoteRepo quoteRepo, CompanyRepo companyRepo, ChangeQuoteRepo changeQuoteRepo) {
+    @Autowired
+    public MyExecutorService(ScheduledExecutorService threadPool,RestTemplate restTemplate,Environment environment,QuoteRepo quoteRepo, CompanyRepo companyRepo, ChangeQuoteRepo changeQuoteRepo) {
         this.quoteRepo = quoteRepo;
         this.companyRepo = companyRepo;
         this.changeQuoteRepo = changeQuoteRepo;
         this.environment=environment;
+        this.restTemplate=restTemplate;
+        this.threadPool=threadPool;
     }
 
     private CompletableFuture<Symbol[]> getSymbolsFromIex(ExecutorService threadPool) {
         logger.info("Start ");
-        RestTemplate restTemplate = new RestTemplate();
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(environment.getProperty("url"));
         stringBuffer.append("/ref-data/symbols?");
         stringBuffer.append(environment.getProperty("tkn"));
-        System.out.println(stringBuffer.toString());
         return CompletableFuture.supplyAsync(() ->
                         restTemplate.getForObject(stringBuffer.toString(), Symbol[].class)
                 , threadPool);
@@ -70,7 +68,6 @@ public class MyExecutorService {
     }
 
     private List<CompletableFuture<Company>> getCompaniesFromIex(ExecutorService threadPool, List<Symbol> symbols) {
-        RestTemplate restTemplate = new RestTemplate();
 
         return symbols.stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
@@ -86,7 +83,6 @@ public class MyExecutorService {
     }
 
     private List<CompletableFuture<Quote>> getQuotesFromIex(ExecutorService threadPool, List<Symbol> symbols) {
-        RestTemplate restTemplate = new RestTemplate();
 
         return symbols.stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
