@@ -1,5 +1,6 @@
 package com.iex.iexservice.services;
 
+import com.iex.iexservice.DAO.ChangeQuoteDAO;
 import com.iex.iexservice.DAO.CompanyDAO;
 import com.iex.iexservice.DAO.QuoteDAO;
 import com.iex.iexservice.entities.Company;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +46,7 @@ public class ViewService {
                     .limit(5)
                     .collect(Collectors.toList());
         }catch (Exception e){
-
+            logger.error(e.getMessage());
         }
         logger.info("The top 5 highest value stocks:" + quoteList);
     }
@@ -52,12 +54,19 @@ public class ViewService {
     public void viewTopCompanies() {
         List<CompanyDAO>  companyList=new ArrayList<>();
         try {
-            companyList = changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
+            List<ChangeQuoteDAO> changeQuoteDAOList =changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
                     .limit(5)
-                    .map(p -> companyRepo.findById(p.getSymbol()).get())
+                    .collect(Collectors.toList());
+            System.out.println(changeQuoteDAOList);
+            companyList = changeQuoteDAOList.stream()
+                    .map(p ->{
+                        Optional<CompanyDAO> companyDAO=companyRepo.findById(p.getSymbol());
+                                if(companyDAO.isPresent())return companyDAO.get();
+                                else return null;
+                    })
                     .collect(Collectors.toList());
         }catch (Exception e){
-
+            logger.error(e.getMessage());
         }
         logger.info("The most recent 5 companies that have the greatest change:" + companyList);
     }

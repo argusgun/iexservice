@@ -63,6 +63,7 @@ public class MyExecutorService {
             CompanyDAO company = companyRepo.findById(id).get();
             return company;
         } catch (Exception e) {
+//            logger.error(e.getMessage());
             return null;
         }
     }
@@ -72,12 +73,14 @@ public class MyExecutorService {
         return symbols.stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
                     StringBuffer stringBuffer = new StringBuffer();
-                    stringBuffer.append(environment.getProperty("site"));
+                    stringBuffer.append(environment.getProperty("url"));
                     stringBuffer.append("/stock/");
                     stringBuffer.append(s.getSymbol());
                     stringBuffer.append("/company?");
                     stringBuffer.append(environment.getProperty("tkn"));
-                    return restTemplate.getForObject(stringBuffer.toString(), Company.class);
+                    Company company= restTemplate.getForObject(stringBuffer.toString(), Company.class);
+//                    System.out.println(company);
+                    return company;
                 }, threadPool))
                 .collect(Collectors.toList());
     }
@@ -87,7 +90,7 @@ public class MyExecutorService {
         return symbols.stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
                     StringBuffer stringBuffer = new StringBuffer();
-                    stringBuffer.append(environment.getProperty("site"));
+                    stringBuffer.append(environment.getProperty("url"));
                     stringBuffer.append("/stock/");
                     stringBuffer.append(s.getSymbol());
                     stringBuffer.append("/quote?");
@@ -102,68 +105,58 @@ public class MyExecutorService {
         try {
             List<Symbol> symbols = Arrays.asList(getSymbolsFromIex(threadPool).get());
             logger.info("Get Symbols from IEX succeed");
-            List<CompanyDAO> companies = getCompaniesFromIex(threadPool, symbols).stream()
-                    .filter(p -> {
-                        Company company = null;
-                        try {
-                            company = p.get();
-                        } catch (InterruptedException e) {
-                            return false;
-                        } catch (ExecutionException e) {
-                            return false;
-                        }
-                        if (!company.equals(getCompaniesFromDB(company.getSymbol())) || getCompaniesFromDB(company.getSymbol()) == null)
-                            return true;
-                        else return false;
-                    })
+            List<Company> companies = getCompaniesFromIex(threadPool, symbols).stream()
                     .map(p -> {
                         try {
-                            return CompanyDAO.fromEntityToDao(p.get());
+                         return p.get();
                         } catch (InterruptedException e) {
+//                            logger.error(e.getMessage());
                             return null;
                         } catch (ExecutionException e) {
+//                            logger.error(e.getMessage());
                             return null;
                         }
                     })
                     .collect(Collectors.toList());
-            companyRepo.saveAll(companies);
+            List<CompanyDAO> companyDAOList=companies.stream()
+                    .filter(Objects::nonNull)
+                    .map(p -> CompanyDAO.fromEntityToDao(p))
+                    .collect(Collectors.toList());
+            companyRepo.saveAll(companyDAOList);
             logger.info("Save Companies to DB succeed");
             List<QuoteDAO> quotes = getQuotesFromIex(threadPool, symbols).stream()
-                    .filter(p -> {
-                        try {
-                            if(p.get()!=null) return true;
-                        } catch (InterruptedException e) {
-                            return false;
-                        } catch (ExecutionException e) {
-                            return false;
-                        }
-                        return false;
-                    })
                     .map(p -> {
                         try {
                             return QuoteDAO.fromEntityToDAO(p.get());
                         } catch (InterruptedException e) {
+//                            logger.error(e.getMessage());
                             return null;
                         } catch (ExecutionException e) {
+//                            logger.error(e.getMessage());
                             return null;
                         }
                     })
                     .collect(Collectors.toList());
-            quoteRepo.saveAll(quotes);
+            List<QuoteDAO> quoteDAOList=quotes.stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            quoteRepo.saveAll(quoteDAOList);
             logger.info("Save Quotes to DB succeed");
-            List<ChangeQuoteDAO> changeQuotes = quotes.stream()
+            List<ChangeQuoteDAO> changeQuotes = quoteDAOList.stream()
                     .map(p -> {
-                                Optional<QuoteDAO> qdb1 = quoteRepo.findById(p.getSymbol());
-                                if (!Optional.empty().equals(qdb1)) {
-                                    QuoteDAO qdb = qdb1.get();
-                                    double d;
-                                    if (p.getLatestPrice() != null && qdb.getLatestPrice() != null) {
-                                        d = Math.abs(p.getLatestPrice() - qdb.getLatestPrice());
-                                        return new ChangeQuoteDAO(p.getSymbol(), d);
-                                    }
-                                    return null;
-
+                        if(p!=null) {
+                            Optional<QuoteDAO> qdb1 = quoteRepo.findById(p.getSymbol());
+                            if (!Optional.empty().equals(qdb1)) {
+                                QuoteDAO qdb = qdb1.get();
+                                double d;
+                                if (p.getLatestPrice() != null && qdb.getLatestPrice() != null) {
+                                    d = Math.abs(p.getLatestPrice() - qdb.getLatestPrice());
+                                    return new ChangeQuoteDAO(p.getSymbol(), d);
                                 }
+                                return null;
+
+                            }
+                        }
                                 return null;
                             }
                     )
@@ -174,6 +167,7 @@ public class MyExecutorService {
             changeQuoteRepo.saveAll(changeQuoteList);
             logger.info("Save Changes for Quotes to DB succeed");
         } catch (Exception e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 

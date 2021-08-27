@@ -34,37 +34,6 @@ public class Symbol {
     @JsonProperty("cik")
     private Long cik;
 
-//    @JsonCreator
-//    public Symbol( String symbol,
-//                   String name,
-//                   String exchange,
-//                   String exchangeSuffix,
-//                   String exchangeName,
-//                   String lei,
-//                   String date,
-//                   String type,
-//                   String iexId,
-//                   String region,
-//                   String currency,
-//                   boolean isEnabled,
-//                   String figi,
-//                   Long cik) {
-//        this.symbol = symbol;
-//        this.name = name;
-//        this.date = date;
-//        this.type = type;
-//        this.iexId = iexId;
-//        this.region = region;
-//        this.currency = currency;
-//        this.isEnabled = isEnabled;
-//        this.figi = figi;
-//        this.cik = cik;
-//        this.exchange = exchange;
-//        this.exchangeSuffix = exchangeSuffix;
-//        this.exchangeName = exchangeName;
-//        this.lei = lei;
-//    }
-
     @Override
     public String toString() {
         return "Symbol{" +

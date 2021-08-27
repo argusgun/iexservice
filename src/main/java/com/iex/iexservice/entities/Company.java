@@ -1,10 +1,7 @@
 package com.iex.iexservice.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +48,9 @@ public class Company {
     private String country;
     @JsonProperty("phone")
     private String phone;
+
+    public Company() {
+    }
 
     public Company(String symbol, String companyName, int employees, String exchange, String industry, String website, String description, String CEO, String securityName, String issueType, String sector, int primarySicCode, List<String> tags, String address, String address2, String state, String city, String zip, String country, String phone) {
         this.symbol = symbol;

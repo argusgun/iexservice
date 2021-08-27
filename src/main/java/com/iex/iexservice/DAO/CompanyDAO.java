@@ -3,10 +3,12 @@ package com.iex.iexservice.DAO;
 import com.iex.iexservice.entities.Company;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 import java.util.Objects;
 
+@Document(collection = "company")
 @Data
 public class CompanyDAO {
     @Id
