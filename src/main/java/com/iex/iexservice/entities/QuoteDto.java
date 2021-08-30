@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Quote {
+public class QuoteDto {
     @JsonProperty("symbol")
     private String symbol;
     @JsonProperty("companyName")
@@ -118,65 +118,4 @@ public class Quote {
     @JsonProperty("isUSMarketOpen")
     private boolean isUSMarketOpen;
 
-    public Quote() {
-    }
-
-    public Quote(String symbol, String companyName, String primaryExchange, String calculationPrice, Double open, Long openTime, String openSource, Double close, Long closeTime, String closeSource, Double high, Long highTime, String highSource, Double low, Long lowTime, String lowSource, Double latestPrice, String latestSource, String latestTime, Long latestUpdate, Long latestVolume, Double iexRealtimePrice, Long iexRealtimeSize, Long iexLastUpdated, Double delayedPrice, Long delayedPriceTime, Double oddLotDelayedPrice, Long oddLotDelayedPriceTime, Double extendedPrice, Double extendedChange, Double extendedChangePercent, Long extendedPriceTime, Double previousClose, Long previousVolume, Double change, Double changePercent, Long volume, Double iexMarketPercent, Long iexVolume, Long avgTotalVolume, Double iexBidPrice, Long iexBidSize, Double iexAskPrice, Long iexAskSize, Double iexOpen, Long iexOpenTime, Double iexClose, Long iexCloseTime, Long marketCap, Double peRatio, Double week52High, Double week52Low, Double ytdChange, Long lastTradeTime, String currency, boolean isUSMarketOpen) {
-        this.symbol = symbol;
-        this.companyName = companyName;
-        this.primaryExchange = primaryExchange;
-        this.calculationPrice = calculationPrice;
-        this.open = open;
-        this.openTime = openTime;
-        this.openSource = openSource;
-        this.close = close;
-        this.closeTime = closeTime;
-        this.closeSource = closeSource;
-        this.high = high;
-        this.highTime = highTime;
-        this.highSource = highSource;
-        this.low = low;
-        this.lowTime = lowTime;
-        this.lowSource = lowSource;
-        this.latestPrice = latestPrice;
-        this.latestSource = latestSource;
-        this.latestTime = latestTime;
-        this.latestUpdate = latestUpdate;
-        this.latestVolume = latestVolume;
-        this.iexRealtimePrice = iexRealtimePrice;
-        this.iexRealtimeSize = iexRealtimeSize;
-        this.iexLastUpdated = iexLastUpdated;
-        this.delayedPrice = delayedPrice;
-        this.delayedPriceTime = delayedPriceTime;
-        this.oddLotDelayedPrice = oddLotDelayedPrice;
-        this.oddLotDelayedPriceTime = oddLotDelayedPriceTime;
-        this.extendedPrice = extendedPrice;
-        this.extendedChange = extendedChange;
-        this.extendedChangePercent = extendedChangePercent;
-        this.extendedPriceTime = extendedPriceTime;
-        this.previousClose = previousClose;
-        this.previousVolume = previousVolume;
-        this.change = change;
-        this.changePercent = changePercent;
-        this.volume = volume;
-        this.iexMarketPercent = iexMarketPercent;
-        this.iexVolume = iexVolume;
-        this.avgTotalVolume = avgTotalVolume;
-        this.iexBidPrice = iexBidPrice;
-        this.iexBidSize = iexBidSize;
-        this.iexAskPrice = iexAskPrice;
-        this.iexAskSize = iexAskSize;
-        this.iexOpen = iexOpen;
-        this.iexOpenTime = iexOpenTime;
-        this.iexClose = iexClose;
-        this.iexCloseTime = iexCloseTime;
-        this.marketCap = marketCap;
-        this.peRatio = peRatio;
-        this.week52High = week52High;
-        this.week52Low = week52Low;
-        this.ytdChange = ytdChange;
-        this.lastTradeTime = lastTradeTime;
-        this.currency = currency;
-        this.isUSMarketOpen = isUSMarketOpen;
-    }
 }

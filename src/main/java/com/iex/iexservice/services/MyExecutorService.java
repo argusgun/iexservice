@@ -1,12 +1,12 @@
 package com.iex.iexservice.services;
 
 
-import com.iex.iexservice.DAO.ChangeQuoteDAO;
-import com.iex.iexservice.DAO.CompanyDAO;
-import com.iex.iexservice.DAO.QuoteDAO;
-import com.iex.iexservice.entities.Company;
-import com.iex.iexservice.entities.Quote;
-import com.iex.iexservice.entities.Symbol;
+import com.iex.iexservice.DAO.ChangeQuoteEntity;
+import com.iex.iexservice.DAO.CompanyEntity;
+import com.iex.iexservice.DAO.QuoteEntity;
+import com.iex.iexservice.entities.CompanyDto;
+import com.iex.iexservice.entities.QuoteDto;
+import com.iex.iexservice.entities.SymbolDto;
 import com.iex.iexservice.repositories.ChangeQuoteRepo;
 import com.iex.iexservice.repositories.CompanyRepo;
 import com.iex.iexservice.repositories.QuoteRepo;
@@ -14,7 +14,6 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -47,20 +46,20 @@ public class MyExecutorService {
         this.threadPool=threadPool;
     }
 
-    private CompletableFuture<Symbol[]> getSymbolsFromIex(ExecutorService threadPool) {
+    private CompletableFuture<SymbolDto[]> getSymbolsFromIex(ExecutorService threadPool) {
         logger.info("Start ");
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(environment.getProperty("url"));
         stringBuffer.append("/ref-data/symbols?");
         stringBuffer.append(environment.getProperty("tkn"));
         return CompletableFuture.supplyAsync(() ->
-                        restTemplate.getForObject(stringBuffer.toString(), Symbol[].class)
+                        restTemplate.getForObject(stringBuffer.toString(), SymbolDto[].class)
                 , threadPool);
     }
 
-    private CompanyDAO getCompaniesFromDB(String id) {
+    private CompanyEntity getCompaniesFromDB(String id) {
         try {
-            CompanyDAO company = companyRepo.findById(id).get();
+            CompanyEntity company = companyRepo.findById(id).get();
             return company;
         } catch (Exception e) {
 //            logger.error(e.getMessage());
@@ -68,9 +67,9 @@ public class MyExecutorService {
         }
     }
 
-    private List<CompletableFuture<Company>> getCompaniesFromIex(ExecutorService threadPool, List<Symbol> symbols) {
+    private List<CompletableFuture<CompanyDto>> getCompaniesFromIex(ExecutorService threadPool, List<SymbolDto> symbolDtos) {
 
-        return symbols.stream()
+        return symbolDtos.stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
                     StringBuffer stringBuffer = new StringBuffer();
                     stringBuffer.append(environment.getProperty("url"));
@@ -78,16 +77,16 @@ public class MyExecutorService {
                     stringBuffer.append(s.getSymbol());
                     stringBuffer.append("/company?");
                     stringBuffer.append(environment.getProperty("tkn"));
-                    Company company= restTemplate.getForObject(stringBuffer.toString(), Company.class);
+                    CompanyDto companyDto = restTemplate.getForObject(stringBuffer.toString(), CompanyDto.class);
 //                    System.out.println(company);
-                    return company;
+                    return companyDto;
                 }, threadPool))
                 .collect(Collectors.toList());
     }
 
-    private List<CompletableFuture<Quote>> getQuotesFromIex(ExecutorService threadPool, List<Symbol> symbols) {
+    private List<CompletableFuture<QuoteDto>> getQuotesFromIex(ExecutorService threadPool, List<SymbolDto> symbolDtos) {
 
-        return symbols.stream()
+        return symbolDtos.stream()
                 .map(s -> CompletableFuture.supplyAsync(() -> {
                     StringBuffer stringBuffer = new StringBuffer();
                     stringBuffer.append(environment.getProperty("url"));
@@ -95,17 +94,17 @@ public class MyExecutorService {
                     stringBuffer.append(s.getSymbol());
                     stringBuffer.append("/quote?");
                     stringBuffer.append(environment.getProperty("tkn"));
-                    Quote quote = restTemplate.getForObject(stringBuffer.toString(), Quote.class);
-                    return quote;
+                    QuoteDto quoteDto = restTemplate.getForObject(stringBuffer.toString(), QuoteDto.class);
+                    return quoteDto;
                 }, threadPool))
                 .collect(Collectors.toList());
     }
 
     public void execute() {
         try {
-            List<Symbol> symbols = Arrays.asList(getSymbolsFromIex(threadPool).get());
+            List<SymbolDto> symbolDtos = Arrays.asList(getSymbolsFromIex(threadPool).get());
             logger.info("Get Symbols from IEX succeed");
-            List<Company> companies = getCompaniesFromIex(threadPool, symbols).stream()
+            List<CompanyDto> companies = getCompaniesFromIex(threadPool, symbolDtos).stream()
                     .map(p -> {
                         try {
                          return p.get();
@@ -118,16 +117,16 @@ public class MyExecutorService {
                         }
                     })
                     .collect(Collectors.toList());
-            List<CompanyDAO> companyDAOList=companies.stream()
+            List<CompanyEntity> companyEntityList =companies.stream()
                     .filter(Objects::nonNull)
-                    .map(p -> CompanyDAO.fromEntityToDao(p))
+                    .map(p -> CompanyEntity.fromDtoToEntity(p))
                     .collect(Collectors.toList());
-            companyRepo.saveAll(companyDAOList);
+            companyRepo.saveAll(companyEntityList);
             logger.info("Save Companies to DB succeed");
-            List<QuoteDAO> quotes = getQuotesFromIex(threadPool, symbols).stream()
+            List<QuoteEntity> quotes = getQuotesFromIex(threadPool, symbolDtos).stream()
                     .map(p -> {
                         try {
-                            return QuoteDAO.fromEntityToDAO(p.get());
+                            return QuoteEntity.fromDtoToEntity(p.get());
                         } catch (InterruptedException e) {
 //                            logger.error(e.getMessage());
                             return null;
@@ -137,21 +136,21 @@ public class MyExecutorService {
                         }
                     })
                     .collect(Collectors.toList());
-            List<QuoteDAO> quoteDAOList=quotes.stream()
+            List<QuoteEntity> quoteEntityList =quotes.stream()
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
-            quoteRepo.saveAll(quoteDAOList);
+            quoteRepo.saveAll(quoteEntityList);
             logger.info("Save Quotes to DB succeed");
-            List<ChangeQuoteDAO> changeQuotes = quoteDAOList.stream()
+            List<ChangeQuoteEntity> changeQuotes = quoteEntityList.stream()
                     .map(p -> {
                         if(p!=null) {
-                            Optional<QuoteDAO> qdb1 = quoteRepo.findById(p.getSymbol());
+                            Optional<QuoteEntity> qdb1 = quoteRepo.findById(p.getSymbol());
                             if (!Optional.empty().equals(qdb1)) {
-                                QuoteDAO qdb = qdb1.get();
+                                QuoteEntity qdb = qdb1.get();
                                 double d;
                                 if (p.getLatestPrice() != null && qdb.getLatestPrice() != null) {
                                     d = Math.abs(p.getLatestPrice() - qdb.getLatestPrice());
-                                    return new ChangeQuoteDAO(p.getSymbol(), d);
+                                    return new ChangeQuoteEntity(p.getSymbol(), d);
                                 }
                                 return null;
 
@@ -161,7 +160,7 @@ public class MyExecutorService {
                             }
                     )
                     .collect(Collectors.toList());
-            List<ChangeQuoteDAO> changeQuoteList=changeQuotes.stream()
+            List<ChangeQuoteEntity> changeQuoteList=changeQuotes.stream()
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             changeQuoteRepo.saveAll(changeQuoteList);

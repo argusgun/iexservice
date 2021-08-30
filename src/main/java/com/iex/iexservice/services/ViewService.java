@@ -1,10 +1,8 @@
 package com.iex.iexservice.services;
 
-import com.iex.iexservice.DAO.ChangeQuoteDAO;
-import com.iex.iexservice.DAO.CompanyDAO;
-import com.iex.iexservice.DAO.QuoteDAO;
-import com.iex.iexservice.entities.Company;
-import com.iex.iexservice.entities.Quote;
+import com.iex.iexservice.DAO.ChangeQuoteEntity;
+import com.iex.iexservice.DAO.CompanyEntity;
+import com.iex.iexservice.DAO.QuoteEntity;
 import com.iex.iexservice.repositories.ChangeQuoteRepo;
 import com.iex.iexservice.repositories.CompanyRepo;
 import com.iex.iexservice.repositories.QuoteRepo;
@@ -40,7 +38,7 @@ public class ViewService {
 
 
     public void viewTopStocks() {
-        List<QuoteDAO> quoteList =new ArrayList<>();
+        List<QuoteEntity> quoteList =new ArrayList<>();
         try {
             quoteList = quoteRepo.findAll(Sort.by(Sort.Direction.DESC, "previousVolume ")).stream()
                     .limit(5)
@@ -52,15 +50,15 @@ public class ViewService {
     }
 
     public void viewTopCompanies() {
-        List<CompanyDAO>  companyList=new ArrayList<>();
+        List<CompanyEntity>  companyList=new ArrayList<>();
         try {
-            List<ChangeQuoteDAO> changeQuoteDAOList =changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
+            List<ChangeQuoteEntity> changeQuoteEntityList =changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
                     .limit(5)
                     .collect(Collectors.toList());
-            System.out.println(changeQuoteDAOList);
-            companyList = changeQuoteDAOList.stream()
+            System.out.println(changeQuoteEntityList);
+            companyList = changeQuoteEntityList.stream()
                     .map(p ->{
-                        Optional<CompanyDAO> companyDAO=companyRepo.findById(p.getSymbol());
+                        Optional<CompanyEntity> companyDAO=companyRepo.findById(p.getSymbol());
                                 if(companyDAO.isPresent())return companyDAO.get();
                                 else return null;
                     })

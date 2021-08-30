@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Symbol {
+public class SymbolDto {
     @JsonProperty("symbol")
     private String symbol;
     @JsonProperty("name")

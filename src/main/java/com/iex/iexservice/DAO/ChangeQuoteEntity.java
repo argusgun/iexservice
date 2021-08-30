@@ -6,12 +6,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "changequote")
 @Data
-public class ChangeQuoteDAO {
+public class ChangeQuoteEntity {
     @Id
     private String symbol;
     private Double change;
 
-    public ChangeQuoteDAO(String symbol, Double change) {
+    public ChangeQuoteEntity(String symbol, Double change) {
         this.symbol = symbol;
         this.change = change;
     }
