@@ -1,6 +1,6 @@
-package com.iex.iexservice.DAO;
+package com.iex.iexservice.entities;
 
-import com.iex.iexservice.entities.QuoteDto;
+import com.iex.iexservice.dto.QuoteDto;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

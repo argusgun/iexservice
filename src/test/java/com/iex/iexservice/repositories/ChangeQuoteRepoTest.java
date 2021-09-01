@@ -1,6 +1,6 @@
 package com.iex.iexservice.repositories;
 
-import com.iex.iexservice.DAO.ChangeQuoteEntity;
+import com.iex.iexservice.entities.ChangeQuoteEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

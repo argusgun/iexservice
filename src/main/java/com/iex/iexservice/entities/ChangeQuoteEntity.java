@@ -1,4 +1,4 @@
-package com.iex.iexservice.DAO;
+package com.iex.iexservice.entities;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

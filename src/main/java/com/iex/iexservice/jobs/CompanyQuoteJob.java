@@ -30,7 +30,6 @@ public class CompanyQuoteJob {
 
     @Scheduled(cron = "${crontask}")
     public void executeView() {
-
         viewService.viewTopStocks();
         viewService.viewTopCompanies();
     }

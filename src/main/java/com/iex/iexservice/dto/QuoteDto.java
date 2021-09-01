@@ -1,4 +1,4 @@
-package com.iex.iexservice.entities;
+package com.iex.iexservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.iex.iexservice.repositories;
 
-import com.iex.iexservice.DAO.QuoteEntity;
+import com.iex.iexservice.entities.QuoteEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

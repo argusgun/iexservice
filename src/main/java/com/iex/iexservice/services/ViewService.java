@@ -1,8 +1,8 @@
 package com.iex.iexservice.services;
 
-import com.iex.iexservice.DAO.ChangeQuoteEntity;
-import com.iex.iexservice.DAO.CompanyEntity;
-import com.iex.iexservice.DAO.QuoteEntity;
+import com.iex.iexservice.entities.ChangeQuoteEntity;
+import com.iex.iexservice.entities.CompanyEntity;
+import com.iex.iexservice.entities.QuoteEntity;
 import com.iex.iexservice.repositories.ChangeQuoteRepo;
 import com.iex.iexservice.repositories.CompanyRepo;
 import com.iex.iexservice.repositories.QuoteRepo;
