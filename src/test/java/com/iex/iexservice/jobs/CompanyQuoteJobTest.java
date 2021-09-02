@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.junit.jupiter.api.Assertions.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@TestPropertySource("/application-test.properties")
 class CompanyQuoteJobTest {
 
     @Autowired
@@ -29,7 +30,7 @@ class CompanyQuoteJobTest {
     @Test
     void executeAppService() {
         companyQuoteJob.executeAppService();
-        Mockito.verify(myExecutorService,Mockito.times(1)).execute();
+        Mockito.verify(myExecutorService,Mockito.atLeast(1)).execute();
     }
 
     @Test
