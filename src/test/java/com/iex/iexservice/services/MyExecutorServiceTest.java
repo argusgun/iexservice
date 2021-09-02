@@ -10,26 +10,27 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@TestPropertySource("/application-test.properties")
 class MyExecutorServiceTest {
-    @Autowired
-    private Environment environment;
 
-    @MockBean
+    @Autowired
     MyExecutorService myExecutorService;
 
     @Test
     public void execute(){
         RestTemplate restTemplate =new RestTemplate();
-        StringBuilder stringBuilder = new StringBuilder(environment.getProperty("url"));
+        StringBuilder stringBuilder = new StringBuilder(myExecutorService.getEnvironment().getProperty("url"));
         stringBuilder.append("/ref-data/symbols?");
-        stringBuilder.append(environment.getProperty("tkn"));
+        stringBuilder.append(myExecutorService.getEnvironment().getProperty("tkn"));
         assertEquals(HttpStatus.OK,restTemplate.getForEntity(stringBuilder.toString(), SymbolDto[].class).getStatusCode());
     }
 
