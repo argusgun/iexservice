@@ -2,11 +2,13 @@ package com.iex.iexservice.entities;
 
 import com.iex.iexservice.dto.QuoteDto;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "quote")
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+
 @Data
+@Entity
 public class QuoteEntity {
     @Id
     private String symbol;

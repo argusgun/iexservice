@@ -1,15 +1,19 @@
 package com.iex.iexservice.entities;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "changequote")
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 @Data
+@Entity
 public class ChangeQuoteEntity {
     @Id
     private String symbol;
     private Double change;
+
+    public ChangeQuoteEntity() {
+    }
 
     public ChangeQuoteEntity(String symbol, Double change) {
         this.symbol = symbol;
