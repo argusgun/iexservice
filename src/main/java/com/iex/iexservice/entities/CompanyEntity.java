@@ -3,8 +3,11 @@ package com.iex.iexservice.entities;
 import com.iex.iexservice.dto.CompanyDto;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,13 +21,15 @@ public class CompanyEntity {
     private String exchange;
     private String industry;
     private String website;
+    @Column(columnDefinition = "longtext")
     private String description;
     private String CEO;
     private String securityName;
     private String issueType;
     private String sector;
     private int primarySicCode;
-    private List<String> tags;
+    @Column(columnDefinition = "longtext")
+    private String tags;
     private String address;
     private String address2;
     private String state;
@@ -47,7 +52,7 @@ public class CompanyEntity {
         entity.issueType = companyDto.getIssueType();
         entity.sector = companyDto.getSector();
         entity.primarySicCode = companyDto.getPrimarySicCode();
-        entity.tags = companyDto.getTags();
+        entity.tags = companyDto.getTags().toString();
         entity.address = companyDto.getAddress();
         entity.address2 = companyDto.getAddress2();
         entity.state = companyDto.getState();
@@ -73,7 +78,7 @@ public class CompanyEntity {
         companyDto.setIssueType(getIssueType());
         companyDto.setSector(getSector());
         companyDto.setPrimarySicCode(getPrimarySicCode());
-        companyDto.setTags(getTags());
+        companyDto.setTags(Arrays.asList(getTags().substring(1,(getTags().length()-2)).split(",")));
         companyDto.setAddress(getAddress());
         companyDto.setAddress2(getAddress2());
         companyDto.setState(getState());

@@ -20,7 +20,9 @@ class ChangeQuoteRepoTest {
 
     @Test
     public void test() {
-        ChangeQuoteEntity objectToSave = new ChangeQuoteEntity("v1",0.1);
+        ChangeQuoteEntity objectToSave = new ChangeQuoteEntity();
+        objectToSave.setSymbol("v1");
+        objectToSave.setChange(0.1);
         changeQuoteRepo.save(objectToSave);
         assertEquals(objectToSave.getChange(),changeQuoteRepo.findById("v1").get().getChange());
     }
@@ -28,7 +30,9 @@ class ChangeQuoteRepoTest {
 
     @Test
     public void updateTest(){
-        ChangeQuoteEntity objectToSave = new ChangeQuoteEntity("v1",0.1);
+        ChangeQuoteEntity objectToSave = new ChangeQuoteEntity();
+        objectToSave.setSymbol("v1");
+        objectToSave.setChange(0.1);
         changeQuoteRepo.save(objectToSave);
         objectToSave.setChange(0.2);
         changeQuoteRepo.save(objectToSave);
@@ -37,7 +41,9 @@ class ChangeQuoteRepoTest {
 
     @Test
     public void removeTest(){
-        ChangeQuoteEntity objectToSave = new ChangeQuoteEntity("v1",0.1);
+        ChangeQuoteEntity objectToSave = new ChangeQuoteEntity();
+        objectToSave.setSymbol("v1");
+        objectToSave.setChange(0.1);
         changeQuoteRepo.save(objectToSave);
         changeQuoteRepo.deleteById(objectToSave.getSymbol());
         Optional<ChangeQuoteEntity> objectToSave1 = changeQuoteRepo.findById(objectToSave.getSymbol());

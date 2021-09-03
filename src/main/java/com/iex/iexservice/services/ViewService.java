@@ -40,7 +40,7 @@ public class ViewService {
     public void viewTopStocks() {
         List<QuoteEntity> quoteList =new ArrayList<>();
         try {
-            quoteList = quoteRepo.findAll(Sort.by(Sort.Direction.DESC, "previousVolume ")).stream()
+            quoteList = quoteRepo.findAllBySymbolIsNotNullOrderByPreviousVolumeDesc().stream()
                     .limit(5)
                     .collect(Collectors.toList());
         }catch (Exception e){
@@ -52,7 +52,7 @@ public class ViewService {
     public void viewTopCompanies() {
         List<CompanyEntity>  companyList=new ArrayList<>();
         try {
-            List<ChangeQuoteEntity> changeQuoteEntityList =changeQuoteRepo.findAll(Sort.by(Sort.Direction.DESC, "change")).stream()
+            List<ChangeQuoteEntity> changeQuoteEntityList =changeQuoteRepo.findAllBySymbolIsNotNullOrderByChangePriceDesc().stream()
                     .limit(5)
                     .collect(Collectors.toList());
             System.out.println(changeQuoteEntityList);

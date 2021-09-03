@@ -18,6 +18,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -147,10 +148,13 @@ public class MyExecutorService {
                             Optional<QuoteEntity> qdb1 = quoteRepo.findById(p.getSymbol());
                             if (!Optional.empty().equals(qdb1)) {
                                 QuoteEntity qdb = qdb1.get();
-                                double d;
+                                Double d;
                                 if (p.getLatestPrice() != null && qdb.getLatestPrice() != null) {
-                                    d = Math.abs(p.getLatestPrice() - qdb.getLatestPrice());
-                                    return new ChangeQuoteEntity(p.getSymbol(), d);
+                                    d = Math.abs(p.getLatestPrice()-qdb.getLatestPrice());
+                                    ChangeQuoteEntity changeQuoteEntity = new ChangeQuoteEntity();
+                                    changeQuoteEntity.setSymbol(p.getSymbol());
+                                    changeQuoteEntity.setChangePrice(d);
+                                    return changeQuoteEntity;
                                 }
                                 return null;
 

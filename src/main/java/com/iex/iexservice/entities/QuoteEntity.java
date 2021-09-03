@@ -5,6 +5,8 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import java.math.BigDecimal;
 
 
 @Data
@@ -45,7 +47,7 @@ public class QuoteEntity {
     private Long extendedPriceTime;
     private Double previousClose;
     private Long previousVolume;
-    private Double change;
+    private Double changePrice;
     private Double changePercent;
     private Long volume;
     private Double iexMarketPercent;
@@ -104,7 +106,7 @@ public class QuoteEntity {
         entity.extendedPriceTime = quoteDto.getExtendedPriceTime();
         entity.previousClose = quoteDto.getPreviousClose();
         entity.previousVolume = quoteDto.getPreviousVolume();
-        entity.change = quoteDto.getChange();
+        entity.changePrice = quoteDto.getChange();
         entity.changePercent = quoteDto.getChangePercent();
         entity.volume = quoteDto.getVolume();
         entity.iexMarketPercent = quoteDto.getIexMarketPercent();
@@ -165,7 +167,7 @@ public class QuoteEntity {
         quoteDto.setExtendedPriceTime(getExtendedPriceTime());
         quoteDto.setPreviousClose(getPreviousClose());
         quoteDto.setPreviousVolume(getPreviousVolume());
-        quoteDto.setChange(getChange());
+        quoteDto.setChange(getChangePrice());
         quoteDto.setChangePercent(getChangePercent());
         quoteDto.setVolume(getVolume());
         quoteDto.setIexMarketPercent(getIexMarketPercent());

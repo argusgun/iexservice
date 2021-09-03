@@ -4,19 +4,13 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Data
 @Entity
 public class ChangeQuoteEntity {
     @Id
     private String symbol;
-    private Double change;
-
-    public ChangeQuoteEntity() {
-    }
-
-    public ChangeQuoteEntity(String symbol, Double change) {
-        this.symbol = symbol;
-        this.change = change;
-    }
+    private Double changePrice;
 }
